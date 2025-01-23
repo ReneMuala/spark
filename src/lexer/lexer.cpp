@@ -19,7 +19,7 @@ spark::lexer::lexer(const std::string&& filename)
     line = col = 1;
 }
 
-std::optional<spark::token> spark::lexer::next_int_or_double()
+spark::token spark::lexer::next_int_or_double()
 {
     std::string value;
     auto type = enums::TINT_NUM;
@@ -37,7 +37,7 @@ std::optional<spark::token> spark::lexer::next_int_or_double()
     return token(type, std::move(value));
 }
 
-std::optional<spark::token> spark::lexer::next_string()
+spark::token spark::lexer::next_string()
 {
     std::string value;
     do
@@ -69,7 +69,7 @@ std::optional<spark::token> spark::lexer::next_string()
     return token(enums::TCHAR_ARRAY, std::move(value));
 }
 
-std::optional<spark::token> spark::lexer::next_equ_or_equal()
+spark::token spark::lexer::next_equ_or_equal()
 {
     auto type = enums::TEQU;
     getchar();
@@ -81,13 +81,13 @@ std::optional<spark::token> spark::lexer::next_equ_or_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_single(const enums::token_type&& type)
+spark::token spark::lexer::next_single(const enums::token_type&& type)
 {
     getchar();
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_not_equal()
+spark::token spark::lexer::next_not_equal()
 {
     std::string value;
     auto type = enums::TERROR;
@@ -101,7 +101,7 @@ std::optional<spark::token> spark::lexer::next_not_equal()
     return type == enums::TERROR ? token(type, std::move(value)) : token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_greater_or_greater_equal()
+spark::token spark::lexer::next_greater_or_greater_equal()
 {
     auto type = enums::TGREATER;
     getchar();
@@ -113,7 +113,7 @@ std::optional<spark::token> spark::lexer::next_greater_or_greater_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_lower_or_lower_equal()
+spark::token spark::lexer::next_lower_or_lower_equal()
 {
     auto type = enums::TLOWER;
     getchar();
@@ -125,7 +125,7 @@ std::optional<spark::token> spark::lexer::next_lower_or_lower_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_plus_or_plus_plus_or_plus_equal()
+spark::token spark::lexer::next_plus_or_plus_plus_or_plus_equal()
 {
     auto type = enums::TPLUS;
     getchar();
@@ -141,7 +141,7 @@ std::optional<spark::token> spark::lexer::next_plus_or_plus_plus_or_plus_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_minus_or_minus_minus_or_minus_equal()
+spark::token spark::lexer::next_minus_or_minus_minus_or_minus_equal()
 {
     std::string value;
     auto type = enums::TMINUS;
@@ -159,7 +159,7 @@ std::optional<spark::token> spark::lexer::next_minus_or_minus_minus_or_minus_equ
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_times_or_times_equal()
+spark::token spark::lexer::next_times_or_times_equal()
 {
     auto type = enums::TTIMES;
     getchar();
@@ -171,7 +171,7 @@ std::optional<spark::token> spark::lexer::next_times_or_times_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_modulo_or_modulo_equal()
+spark::token spark::lexer::next_modulo_or_modulo_equal()
 {
     auto type = enums::TMODULO;
     getchar();
@@ -183,7 +183,7 @@ std::optional<spark::token> spark::lexer::next_modulo_or_modulo_equal()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_slash_or_slash_equal_or_comment()
+spark::token spark::lexer::next_slash_or_slash_equal_or_comment()
 {
     auto type = enums::TSLASH;
     getchar();
@@ -214,7 +214,7 @@ std::optional<spark::token> spark::lexer::next_slash_or_slash_equal_or_comment()
     return token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_id_or_keyword()
+spark::token spark::lexer::next_id_or_keyword()
 {
     std::string value;
     auto type = enums::TID;
@@ -267,7 +267,7 @@ std::optional<spark::token> spark::lexer::next_id_or_keyword()
     return type == enums::TID ? token(type, std::move(value)) : token(type);
 }
 
-std::optional<spark::token> spark::lexer::next_error()
+spark::token spark::lexer::next_error()
 {
     std::string value;
     do
@@ -332,7 +332,7 @@ std::optional<spark::token> spark::lexer::next()
     if (it == '!')
     {
         auto && token = next_not_equal();
-        if (token->type == enums::TCOMMENT)
+        if (token.type == enums::TCOMMENT)
             goto begin;
         return token;
     }
@@ -351,7 +351,7 @@ std::optional<spark::token> spark::lexer::next()
     if (it == '/')
     {
         auto && token = next_slash_or_slash_equal_or_comment();
-        if (token->type == enums::TCOMMENT)
+        if (token.type == enums::TCOMMENT)
             goto begin;
         return token;
     }

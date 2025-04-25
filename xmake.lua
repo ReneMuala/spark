@@ -1,13 +1,14 @@
 add_rules("mode.debug", "mode.release")
-add_requires("fmt")
-target("spark")
+add_requires("fmt", "asmjit")
+target("iota")
     set_languages("c++23")
     set_kind("binary")
-    add_packages("fmt")
-    add_includedirs("src/")
+    add_packages("fmt", "asmjit")
+    add_includedirs("src/", "libs/")
     add_files(
             "src/*.cpp",
             "src/lexer/*.cpp",
+            "src/jit/*.cpp",
             "src/parser/*.cpp",
             "src/exceptions/*.cpp",
             "src/composer/*.cpp"

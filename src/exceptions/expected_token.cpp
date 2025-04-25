@@ -4,7 +4,7 @@
 
 #include "expected_token.hpp"
 
-namespace spark::exceptions
+namespace iota::exceptions
 {
     expected_token::expected_token(const std::string& token, const long& line, const long& col): invalid_argument(
         fmt::format("[fatal]: expected token {} at {}:{}", token, line, col))

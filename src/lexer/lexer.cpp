@@ -8,7 +8,7 @@
 #include <optional>
 #include <exceptions/expected_token.hpp>
 
-spark::lexer::lexer(const std::string&& filename)
+iota::lexer::lexer(const std::string&& filename)
 {
     stream.open(filename);
     if (not stream.is_open())
@@ -19,7 +19,7 @@ spark::lexer::lexer(const std::string&& filename)
     line = col = 1;
 }
 
-spark::token spark::lexer::next_int_or_double()
+iota::token iota::lexer::next_int_or_double()
 {
     std::string value;
     auto type = enums::TINT_NUM;
@@ -34,10 +34,10 @@ spark::token spark::lexer::next_int_or_double()
         type = enums::TDOUBLE_NUM;
         goto restart;
     }
-    return token(type, std::move(value));
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_string()
+iota::token iota::lexer::next_string()
 {
     std::string value;
     do
@@ -66,143 +66,204 @@ spark::token spark::lexer::next_string()
     } while (it != '"' or  lit == '\\');
     getchar();
     value.pop_back();
-    return token(enums::TCHAR_ARRAY, std::move(value));
+    return token(enums::TCHAR_ARRAY, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_equ_or_equal()
+iota::token iota::lexer::next_and()
 {
+    std::string value = {it};
+    auto type = enums::TERROR;
+    getchar();
+    if(it == '&')
+    {
+        type = enums::TAND;
+        value+=it;
+        getchar();
+    }
+    return token(type, std::move(value), line, col);
+}
+
+iota::token iota::lexer::next_or()
+{
+    std::string value = {it};
+    auto type = enums::TERROR;
+    getchar();
+    if(it == '|')
+    {
+        type = enums::TAND;
+        value+=it;
+        getchar();
+    }
+    return token(type, std::move(value), line, col);
+}
+
+iota::token iota::lexer::next_equ_or_equal()
+{
+    std::string value = {it};
     auto type = enums::TEQU;
     getchar();
     if(it == '=')
     {
         type = enums::TEQUAL;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_single(const enums::token_type&& type)
+iota::token iota::lexer::next_single(const enums::token_type&& type)
 {
+    std::string value = {it};
     getchar();
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_not_equal()
+iota::token iota::lexer::next_not_equal()
 {
-    std::string value;
+    std::string value = {it};
     auto type = enums::TERROR;
-    value += it;
     getchar();
     if(it == '=')
     {
         type = enums::TNOT_EQUAL;
+        value+=it;
         getchar();
     }
-    return type == enums::TERROR ? token(type, std::move(value)) : token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_greater_or_greater_equal()
+iota::token iota::lexer::next_greater_or_greater_equal()
 {
+    std::string value = {it};
     auto type = enums::TGREATER;
     getchar();
     if(it == '=')
     {
         type = enums::TGREATER_OR_EQUAL;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type,std::move(value),line, col);
 }
 
-spark::token spark::lexer::next_lower_or_lower_equal()
+iota::token iota::lexer::next_lower_or_lower_equal()
 {
+    std::string value = {it};
     auto type = enums::TLOWER;
     getchar();
     if(it == '=')
     {
         type = enums::TLOWER_OR_EQUAL;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_plus_or_plus_plus_or_plus_equal()
+iota::token iota::lexer::next_plus_or_plus_plus_or_plus_equal()
 {
+    std::string value = {it};
     auto type = enums::TPLUS;
     getchar();
     if(it == '=')
     {
         type = enums::TPLUS_EQU;
+        value+=it;
         getchar();
     } else if(it == '+')
     {
         type = enums::TPLUS_PLUS;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type,std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_minus_or_minus_minus_or_minus_equal()
+iota::token iota::lexer::next_minus_or_minus_minus_or_minus_equal()
 {
-    std::string value;
+    std::string value = {it};
     auto type = enums::TMINUS;
     getchar();
     if(it == '=')
     {
         type = enums::TMINUS_EQU;
+        value+=it;
         getchar();
     } else if(it == '-')
     {
         type = enums::TMINUS_MINUS;
+        value+=it;
         getchar();
     }
 
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_times_or_times_equal()
+iota::token iota::lexer::next_times_or_times_equal()
 {
+    std::string value = {it};
     auto type = enums::TTIMES;
     getchar();
     if(it == '=')
     {
         type = enums::TTIMES_EQU;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_modulo_or_modulo_equal()
+iota::token iota::lexer::next_modulo_or_modulo_equal()
 {
+    std::string value = {it};
     auto type = enums::TMODULO;
     getchar();
     if(it == '=')
     {
         type = enums::TMODULO_EQU;
+        value+=it;
         getchar();
     }
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_slash_or_slash_equal_or_comment()
+iota::token iota::lexer::next_slash_or_slash_equal_or_comment()
 {
+    std::string value = {it};
     auto type = enums::TSLASH;
     getchar();
     if(it == '=')
     {
         type = enums::TSLASH_EQU;
+        value+=it;
         getchar();
     } else if (it == '/')
     {
         type = enums::TCOMMENT;
         do
+        {
+            if (value.size() == 10)
+            {
+                value += "...";
+            } else if (value.size() < 10)
+            {
+                value += it;
+            }
             getchar();
-        while(it != '\n' and not stream.eof());
+        } while(it != '\n' and not stream.eof());
     } else if (it == '*')
     {
         int depth = 1;
         type = enums::TCOMMENT;
         do
         {
+            if (value.size() == 10)
+            {
+                value += "...";
+            } else if (value.size() < 10)
+            {
+                value += it;
+            }
             getchar();
             if (stream.eof())
                 throw exceptions::expected_token("*/", line, col);
@@ -211,10 +272,10 @@ spark::token spark::lexer::next_slash_or_slash_equal_or_comment()
         } while(depth);
         getchar();
     }
-    return token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_id_or_keyword()
+iota::token iota::lexer::next_id_or_keyword()
 {
     std::string value;
     auto type = enums::TID;
@@ -222,52 +283,68 @@ spark::token spark::lexer::next_id_or_keyword()
     {
         value+=it;
         getchar();
-    } while (isalnum(it));
+    } while (isalnum(it) or it == '_');
 
     // for, while, if, else, fun, type, mut, yield, when, init, this, object
-    if (value.length() >= 2 and value.length() <= 5)
+    if (value.length() >= 2 and value.length() <= 9)
     {
-        if (value == "and")
-            type = enums::TKEY_AND;
-        else if (value == "or")
-            type = enums::TKEY_OR;
-        else if (value == "not")
-            type = enums::TKEY_NOT;
-        else if (value == "for")
-            type = enums::TKEY_FOR;
+        if (value == "for")
+            type = enums::TKEYWORD_FOR;
         else if (value == "while")
-            type = enums::TKEY_WHILE;
+            type = enums::TKEYWORD_WHILE;
         else if (value == "if")
-            type = enums::TKEY_IF;
+            type = enums::TKEYWORD_IF;
         else if (value == "else")
-            type = enums::TKEY_ELSE;
-        else if (value == "fun")
-            type = enums::TKEY_FUN;
+            type = enums::TKEYWORD_ELSE;
+        else if (value == "function" or value == "func")
+            type = enums::TKEYWORD_FUNCTION;
         else if (value == "type")
-            type = enums::TKEY_TYPE;
-        else if (value == "mut")
-            type = enums::TKEY_MUT;
+            type = enums::TKEYWORD_TYPE;
+        else if (value == "mutable")
+            type = enums::TKEYWORD_MUTABLE;
         else if (value == "yield")
-            type = enums::TKEY_YIELD;
+            type = enums::TKEYWORD_YIELD;
         else if (value == "when")
-            type = enums::TKEY_WHEN;
+            type = enums::TKEYWORD_WHEN;
         else if (value == "init")
-            type = enums::TKEY_INIT;
+            type = enums::TKEYWORD_INIT;
         else if (value == "this")
-            type = enums::TKEY_THIS;
-        else if (value == "object")
-            type = enums::TKEY_OBJECT;
+            type = enums::TKEYWORD_THIS;
         else if (value == "true")
-            type = enums::TKEY_TRUE;
+            type = enums::TKEYWORD_TRUE;
         else if (value == "false")
-            type = enums::TKEY_FALSE;
-        else if (value == "is")
-            type = enums::TKEY_IS;
+            type = enums::TKEYWORD_FALSE;
+        else if (value == "break")
+            type = enums::TKEYWORD_BREAK;
+        else if (value == "continue")
+            type = enums::TKEYWORD_CONTINUE;
+        else if (value == "return")
+            type = enums::TKEYWORD_RETURN;
+        else if (value == "as")
+            type = enums::TKEYWORD_AS;
+        else if (value == "any")
+            type = enums::TKEYWORD_ANY;
+        else if (value == "string")
+            type = enums::TKEYWORD_STRING;
+        else if (value == "number")
+            type = enums::TKEYWORD_NUMBER;
+        else if (value == "undefined")
+            type = enums::TKEYWORD_UNDEFINED;
+        else if (value == "null")
+            type = enums::TKEYWORD_NULL;
+        else if (value == "switch")
+            type = enums::TKEYWORD_SWITCH;
+        else if (value == "case")
+            type = enums::TKEYWORD_CASE;
+        else if (value == "var")
+            type = enums::TKEYWORD_VAR;
+        else if (value == "const")
+            type = enums::TKEYWORD_CONST;
     }
-    return type == enums::TID ? token(type, std::move(value)) : token(type);
+    return token(type, std::move(value), line, col);
 }
 
-spark::token spark::lexer::next_error()
+iota::token iota::lexer::next_error()
 {
     std::string value;
     do
@@ -275,10 +352,10 @@ spark::token spark::lexer::next_error()
         value+=it;
         getchar();
     } while (not isspace(it) and not stream.eof());
-    return token(enums::TERROR, std::move(value));
+    return token(enums::TERROR, std::move(value), line, col);
 }
 
-void spark::lexer::getchar()
+void iota::lexer::getchar()
 {
     lit = it;
     if (it == '\n' or it == '\r')
@@ -292,7 +369,7 @@ void spark::lexer::getchar()
     it = static_cast<char>(stream.get());
 }
 
-std::optional<spark::token> spark::lexer::next()
+std::optional<iota::token> iota::lexer::next()
 {
     begin:
     while (std::isspace(it) or it == 0)
@@ -323,12 +400,18 @@ std::optional<spark::token> spark::lexer::next()
         return next_single(enums::TQUESTION);
     if (it == ':')
         return next_single(enums::TCOLON);
+    if (it == ';')
+        return next_single(enums::TSEMICOLON);
     if (it == '$')
         return next_single(enums::TDOLLAR);
     if (it == '"')
         return next_string();
     if (it == '=')
         return next_equ_or_equal();
+    if (it == '&')
+        return next_and();
+    if (it == '|')
+        return next_or();
     if (it == '!')
     {
         auto && token = next_not_equal();

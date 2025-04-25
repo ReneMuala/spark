@@ -6,11 +6,18 @@
 #include "enums/token_type.hpp"
 #include <string>
 
-namespace spark {
-    class token {
-        public:
-        enums::token_type type;
+namespace iota {
+    struct token {
+        const enums::token_type type;
         std::string value;
-        explicit token(const enums::token_type& type, std::string&& value = "");
+        long line, column;
+
+        [[nodiscard]] inline std::string get_location_string() const
+        {
+            return std::to_string(line) + ":" + std::to_string(column);
+        }
+
+        explicit token(const enums::token_type& type, std::string&& value , long line = 0, long column = 0);
+        explicit token(const enums::token_type& type, long line = 0, long column = 0);
     };
-} // spark
+} // iota

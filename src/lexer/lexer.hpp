@@ -10,7 +10,7 @@
 #include <exceptions/file_not_found.hpp>
 #include "token.hpp"
 
-namespace spark {
+namespace iota {
     class lexer {
         std::ifstream stream;
         char lit, it;
@@ -19,9 +19,11 @@ namespace spark {
         public:
         explicit lexer(const std::string&& filename);
 
-        inline std::optional<token> next();
+        std::optional<token> next();
         inline token next_int_or_double();
         inline token next_string();
+        iota::token next_and();
+        iota::token next_or();
         inline token next_equ_or_equal();
         inline token next_single(const enums::token_type && type);
         inline token next_not_equal();

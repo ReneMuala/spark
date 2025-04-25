@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <fmt/format.h>
 
-namespace spark::exceptions
+namespace iota::exceptions
 {
     class expected_token final : public std::invalid_argument
     {

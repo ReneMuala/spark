@@ -4,7 +4,7 @@
 
 #include "file_not_found.hpp"
 
-namespace spark::exceptions
+namespace iota::exceptions
 {
     file_not_found::file_not_found(const std::string& file): invalid_argument(fmt::format("[fatal]: file not found {}", file))
     {}
